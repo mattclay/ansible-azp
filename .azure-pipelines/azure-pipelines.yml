@@ -26,7 +26,7 @@ resources:
     - container: default
       image: quay.io/ansible/azure-pipelines-test-container:1.5.0
 
-pool: Standard_D2as_v4-EastUS2
+pool: Standard_D2as_v4-SouthCentralUS
 
 stages:
   - template: grouped.yml
