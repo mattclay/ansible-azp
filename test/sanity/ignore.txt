@@ -277,8 +277,6 @@ test/units/module_utils/basic/test_deprecate_warn.py pylint:ansible-deprecated-n
 test/units/module_utils/basic/test_deprecate_warn.py pylint:ansible-deprecated-version
 test/units/module_utils/basic/test_run_command.py pylint:blacklisted-name
 test/units/module_utils/urls/fixtures/multipart.txt line-endings  # Fixture for HTTP tests that use CRLF
-test/units/module_utils/urls/test_Request.py replace-urlopen
-test/units/module_utils/urls/test_fetch_url.py replace-urlopen
 test/units/modules/test_apt.py pylint:blacklisted-name
 test/units/parsing/vault/test_vault.py pylint:blacklisted-name
 test/units/playbook/role/test_role.py pylint:blacklisted-name
@@ -293,5 +291,3 @@ test/units/utils/collection_loader/fixtures/collections_masked/ansible_collectio
 test/units/utils/collection_loader/fixtures/collections_masked/ansible_collections/testns/__init__.py empty-init  # testing that collections don't need inits
 test/units/utils/collection_loader/fixtures/collections_masked/ansible_collections/testns/testcoll/__init__.py empty-init  # testing that collections don't need inits
 test/units/utils/collection_loader/test_collection_loader.py pylint:undefined-variable  # magic runtime local var splatting
-test/utils/shippable/check_matrix.py replace-urlopen
-test/utils/shippable/timing.py shebang

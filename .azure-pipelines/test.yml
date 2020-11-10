@@ -1,0 +1,43 @@
+steps:
+  - checkout: self
+    fetchDepth: 100
+  - bash: .azure-pipelines/timing.sh test/utils/shippable/shippable.sh ${{ parameters.test }}
+    displayName: Run Tests
+  - bash: |
+      set -o pipefail -eu
+      if compgen -G 'test/results/junit/*.xml' > /dev/null; then
+        echo "##vso[task.setVariable variable=HaveTestResults]true"
+      fi
+      if compgen -G 'test/results/bot/ansible-test-*' > /dev/null; then
+        echo "##vso[task.setVariable variable=HaveBotResults]true"
+      fi
+      if compgen -G 'test/results/coverage/*' > /dev/null; then
+        echo "##vso[task.setVariable variable=HaveCoverageData]true"
+      fi
+    condition: succeededOrFailed()
+    displayName: Check Test Output
+  - bash: |
+      set -o pipefail -eu
+      mkdir $(Agent.TempDirectory)/coverage/
+      options="--venv --venv-system-site-packages --color -v"
+      bin/ansible-test coverage combine --export $(Agent.TempDirectory)/coverage/ $options
+      bin/ansible-test coverage analyze targets generate $(Agent.TempDirectory)/coverage/coverage-analyze-targets.json $options
+    condition: eq(variables.HaveCoverageData, 'true')
+    displayName: Aggregate Coverage Data
+  - task: PublishTestResults@2
+    condition: eq(variables.HaveTestResults, 'true')
+    inputs:
+      testResultsFiles: 'test/results/junit/*.xml'
+    displayName: Publish Test Results
+  - task: PublishPipelineArtifact@1
+    condition: eq(variables.HaveBotResults, 'true')
+    displayName: Publish Bot Results
+    inputs:
+      targetPath: 'test/results/bot/'
+      artifactName: "Bot $(System.JobAttempt) $(System.StageDisplayName) $(System.JobDisplayName)"
+  - task: PublishPipelineArtifact@1
+    condition: eq(variables.HaveCoverageData, 'true')
+    displayName: Publish Coverage Data
+    inputs:
+      targetPath: '$(Agent.TempDirectory)/coverage/'
+      artifactName: "Coverage $(System.JobAttempt) $(System.StageDisplayName) $(System.JobDisplayName)"
