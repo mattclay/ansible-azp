@@ -13,7 +13,7 @@ docker images ansible/ansible
 docker images quay.io/ansible/*
 docker ps
 
-for container in $(docker ps --format '{{.Image}} {{.ID}}' | grep -v '^drydock/' | sed 's/^.* //'); do
+for container in $(docker ps --format '{{.Image}} {{.ID}}' | grep -v -e '^drydock/' -e '^quay.io/ansible/azure-pipelines-test-container:' | sed 's/^.* //'); do
     docker rm -f "${container}" || true  # ignore errors
 done
 
@@ -116,8 +116,6 @@ function cleanup
     cp -aT test/results/bot/ shippable/testresults/
 }
 
-trap cleanup EXIT
-
 if [[ "${COVERAGE:-}" == "--coverage" ]]; then
     timeout=60
 else
@@ -126,5 +124,4 @@ fi
 
 ansible-test env --dump --show --timeout "${timeout}" --color -v
 
-"test/utils/shippable/check_matrix.py"
 "test/utils/shippable/${script}.sh" "${test}"
